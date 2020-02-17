@@ -59,6 +59,28 @@ async def on_ready():
 @client.event
 async def on_message(message):
     # print("{0} | {1} | {2} | {3}".format(message.author, message.guild.name, message.channel.name, message.content))
+    badword_list = ['섹스', '느금마', '애미', '애비', '장애인', '느금', '보지', '자지', '니애미']
+    badwords = []
+    if any(x in message.content for x in badword_list) and message.guild == client.get_guild(677424338877546506):
+        for badword in badword_list:
+            if badword in message.content:
+                badwords.append(badword)
+
+        print(badwords)
+        from datetime import datetime
+        embed = discord.Embed(
+            description="{0}, {1} **채널에서 욕설 사용**".format(message.author.mention, message.channel.mention),
+            # description='저를 부를 땐 앞에 "도비야"를 붙여주세요!',
+            timestamp=datetime.utcnow(),
+            colour=discord.Colour.red()
+        )
+        embed.set_author(name=message.author,
+                         icon_url=message.author.avatar_url)
+        embed.add_field(name="제거된 메시지", value=message.content)
+        embed.add_field(name="감지된 욕설 ({0})".format(len(badwords)), value=", ".join(str(i) for i in badwords), inline=False)
+        embed.set_footer(text="ID: {0}".format(message.author.id))
+        await message.delete()
+        await client.get_channel(678834899947618326).send(embed=embed)
 
     # 개인 메시지
     if isinstance(message.channel, discord.DMChannel):
