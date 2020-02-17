@@ -53,13 +53,13 @@ async def on_ready():
     # 봇 상태
     await client.change_presence(status=discord.Status.idle)
     # 봇 활동 (type: 0=하는중, 1=트위치 생방송중, 2=듣는중)
-    await client.change_presence(activity=discord.Activity(name='도비야 도와줘', type=2))
+    await client.change_presence(activity=discord.Activity(name='Overwatch II', type=1))
 
 
 @client.event
 async def on_message(message):
     # print("{0} | {1} | {2} | {3}".format(message.author, message.guild.name, message.channel.name, message.content))
-    badword_list = ['섹스', '느금마', '애미', '애비', '장애인', '느금', '보지', '자지', '니애미', 'badwordtest123']
+    badword_list = ['섹스', '느금마', '애미', '애비', '장애인', '느금', '보지', '자지', '니애미', 'badwordtest1', 'badwordtest2']
     badwords = []
     if any(x in message.content for x in badword_list) and message.guild == client.get_guild(677424338877546506):
         for badword in badword_list:
@@ -69,7 +69,7 @@ async def on_message(message):
         print(badwords)
         from datetime import datetime
         embed = discord.Embed(
-            description="{0}, {1} **채널에서 욕설 사용**".format(message.author.mention, message.channel.mention),
+            description="{0}님이 {1} **채널에서 욕설을 사용했습니다.**".format(message.author.mention, message.channel.mention),
             # description='저를 부를 땐 앞에 "도비야"를 붙여주세요!',
             timestamp=datetime.utcnow(),
             colour=discord.Colour.red()
@@ -81,6 +81,7 @@ async def on_message(message):
         embed.set_footer(text="ID: {0}".format(message.author.id))
         await message.delete()
         await client.get_channel(678834899947618326).send(embed=embed)
+
 
     # 개인 메시지
     if isinstance(message.channel, discord.DMChannel):
@@ -205,30 +206,54 @@ async def on_message(message):
         await message.channel.send("현재 `BIZ` 서버에는 `{0}`명이 있어요!".format(message.guild.member_count))
 
     if message.content.startswith("도비야 관리자"):
-        admins_str = ""
+        """
         for x in admins:
             admins_str += message.guild.get_member(x).mention + ", "
         await message.channel.send(admins_str + "총 " + str(len(admins)) + "명")
+        """
+        await message.channel.send(", ".join(str(message.guild.get_member(i)) for i in admins))
+        admins_str = ""
 
     if message.content.startswith("도비야 영웅추천"):
+        tank = ["D.va", "라인하르트", "레킹볼", "로드호그", "시그마", "오리사", "윈스턴", "자리야"]
+        damage = ["겐지", "둠피스트", "리퍼", "맥크리", "메이", "바스티온", "솔저: 76", "솜브라", "시메트라", "애쉬", "위도우메이커", "정크랫", "토르비욘", "트레이서", "파라", "한조"]
+        support = ["루시우", "메르시", "모이라", "바티스트", "브리기테", "아나", "젠야타"]
         all_heroes = ["D.va", "겐지", "둠피스트", "라인하르트", "레킹볼", "로드호그",
                   "루시우", "리퍼", "맥크리", "메르시", "메이", "모이라", "바스티온", "바티스트", "브리기테",
                   "솔저: 76", "솜브라", "시그마", "시메트라", "아나", "애쉬", "오리사", "위도우메이커", "윈스턴",
                   "자리야", "정크랫", "젠야타", "토르비욘", "트레이서", "파라", "한조"]
-        tank = ["D.va", "라인하르트", "레킹볼", "로드호그", "시그마", "오리사", "윈스턴", "자리야"]
-        damage = ["겐지", "둠피스트", "리퍼", "맥크리", "메이", "바스티온", "솔저: 76", "솜브라", "시메트라", "애쉬", "위도우메이커", "정크랫", "토르비욘", "트레이서", "파라", "한조"]
-        support = ["루시우", "메르시", "모이라", "바티스트", "브리기테", "아나", "젠야타"]
+        role = message.content[9:10].lower()
 
-        if message.content[9:10] == "탱":
+        if role == "탱":
             result = random.choice(tank)
-        elif message.content[9:10] == "딜":
+        elif role == "딜":
             result = random.choice(damage)
-        elif message.content[9:10] == "힐":
+        elif role == "힐":
             result = random.choice(support)
         else:
             result = random.choice(all_heroes)
 
-        await message.channel.send("{0.mention} `{1}` 이 영웅은 어때요?".format(message.author, result))
+        htm_content = urllib.request.urlopen("https://playoverwatch.com/ko-kr/heroes").read()
+        htm_content = str(htm_content)
+        print(htm_content)
+        profile_img = re.findall(r'<img class="portrait" src="(https://.*?png)"', htm_content)
+
+        print(profile_img)
+        for i in profile_img:
+            print(i)
+
+        embed = discord.Embed(
+            title=result,
+            description=message.author.mention
+        )
+
+        for x in range(0, len(all_heroes)):
+            print(result + ", " + all_heroes[x])
+            if result == all_heroes[x]:
+                embed.set_thumbnail(url=profile_img[x])
+                break
+        # await message.channel.send("{0.mention} **{1}** 하세요".format(message.author, result))
+        await message.channel.send(embed=embed)
 
     if message.content.startswith("도비야 유튜브 "):
         search = message.content[8:]
@@ -298,6 +323,27 @@ async def on_message(message):
         else:
             embed.set_thumbnail(url=profile_img[0])
         await message.channel.send("", embed=embed)
+
+
+    if message.content.startswith("도비야 서버정보"):
+        findbots = sum(1 for message.author in message.guild.members if message.author.bot)
+
+        embed = discord.Embed()
+
+        if message.guild.icon:
+            embed.set_thumbnail(url=message.guild.icon_url)
+        if message.guild.banner:
+            embed.set_image(url=message.guild.banner_url_as(format="png"))
+
+        embed.add_field(name="Server Name", value=message.guild.name, inline=True)
+        embed.add_field(name="Server ID", value=message.guild.id, inline=True)
+        embed.add_field(name="Members", value=message.guild.member_count, inline=True)
+        embed.add_field(name="Bots", value=findbots, inline=True)
+        embed.add_field(name="Owner", value=message.guild.owner, inline=True)
+        embed.add_field(name="Region", value=message.guild.region, inline=True)
+        embed.add_field(name="Created", value=message.guild.created_at, inline=True)
+
+        await message.channel.send(content=f"ℹ information about **{message.guild.name}**", embed=embed)
 
     if message.content.startswith("도비야 입장테스트"):
         welcomechannel = client.get_channel(677424338877546509)
