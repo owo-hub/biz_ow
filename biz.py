@@ -53,7 +53,7 @@ async def on_ready():
     # 봇 상태
     await client.change_presence(status=discord.Status.idle)
     # 봇 활동 (type: 0=하는중, 1=트위치 생방송중, 2=듣는중)
-    await client.change_presence(activity=discord.Activity(name='Powered by owo#4555', type=1))
+    await client.change_presence(activity=discord.Activity(name='도비야 도와줘', type=2))
 
 
 @client.event
