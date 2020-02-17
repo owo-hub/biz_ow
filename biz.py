@@ -59,7 +59,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     # print("{0} | {1} | {2} | {3}".format(message.author, message.guild.name, message.channel.name, message.content))
-    badword_list = ['섹스', '느금마', '애미', '애비', '장애인', '느금', '보지', '자지', '니애미']
+    badword_list = ['섹스', '느금마', '애미', '애비', '장애인', '느금', '보지', '자지', '니애미', 'badwordtest123']
     badwords = []
     if any(x in message.content for x in badword_list) and message.guild == client.get_guild(677424338877546506):
         for badword in badword_list:
