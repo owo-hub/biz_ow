@@ -295,12 +295,60 @@ async def on_message(message):
         url = 'https://playoverwatch.com/ko-kr/career/pc/' + battletag
         url = urllib.parse.urlsplit(url)
         url = list(url)
+        print(url)
         url[2] = urllib.parse.quote(url[2])
         profile_url = urllib.parse.urlunsplit(url)
         print(profile_url)
         htm_content = urllib.request.urlopen(profile_url).read()
         htm_content = str(htm_content)
+        print(htm_content)
         profile_img = re.findall(r'<img class="player-portrait" src="(https://.*?png)"', htm_content)
+        if len(profile_img) < 1:
+            await message.channel.send("유저를 찾을 수 없습니다. (소대문자를 확인해주세요!)")
+            return
+        print("profile image: " + profile_img[0])
+        quickplay_img = re.findall(r'background-image: (https://.*?png)" data-js="heroMastheadImage"', htm_content)
+        player_level_img = htm_content[htm_content.find('<div class="player-level" style'):htm_content.find('<div class="player-rank" style')]
+        player_level_img = re.findall(r' (https://.*?png) ', player_level_img)
+        print(player_level_img)
+        dealtier_img = re.findall(r'<img class="competitive-rank-tier-icon" src="(https://.*?png)"', htm_content)
+        dealscore = re.findall(r'<div class="competitive-rank-level">(.*?)</div>', htm_content)
+        print(dealscore)
+        print(quickplay_img)
+        from datetime import datetime
+        embed = discord.Embed(
+            description="Searched by {.mention}".format(message.author),
+            timestamp=datetime.utcnow(),
+            colour=discord.Colour.green()
+        )
+        embed.set_author(name=tag, icon_url=profile_img[0], url=profile_url)
+        embed.set_image(url=quickplay_img[0])
+        embed.set_footer(text="72", icon_url=player_level_img[0])
+        if len(dealtier_img) > 1:
+            embed.add_field(name="돌격", value=dealscore[0])
+            embed.add_field(name="공격", value=dealscore[1])
+            embed.add_field(name="지원", value=dealscore[2])
+            embed.set_thumbnail(url=dealtier_img[1])
+        else:
+            embed.set_thumbnail(url=profile_img[0])
+        await message.channel.send("", embed=embed)
+
+    if message.content.startswith("도비야 opgg "):
+        tag = message.content[9:]
+        battletag = tag.replace("#", "%23")
+        print(tag + " to " + battletag)
+        url = 'https://overwatch.op.gg/search/?playerName=' + battletag
+        url = urllib.parse.urlsplit(url)
+        url = list(url)
+        print(url)
+        url[2] = urllib.parse.quote(url[2])
+        profile_url = urllib.parse.urlunsplit(url)
+        print(profile_url)
+        htm_content = urllib.request.urlopen(profile_url).read()
+        htm_content = str(htm_content)
+        profile_img = re.findall(r'<div class="ProfileImage"> <div> <img src="(https://.*?png)"', htm_content)
+        print(profile_img)
+        """
         if len(profile_img) < 1:
             await message.channel.send("유저를 찾을 수 없습니다. (소대문자를 확인해주세요!)")
             return
@@ -323,6 +371,7 @@ async def on_message(message):
         else:
             embed.set_thumbnail(url=profile_img[0])
         await message.channel.send("", embed=embed)
+        """
 
 
     if message.content.startswith("도비야 서버정보"):
